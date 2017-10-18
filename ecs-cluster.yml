@@ -1,0 +1,72 @@
+AWSTempateFormatVersion: '2010-09-09'
+Description: 'AWS CF template to create resource for ECS cluster'
+Mappings:
+  VpcCidrs:
+    vpc:
+      cidr: 10.0.0.0/16
+      pubsubnet1: 10.0.0.0/24
+      pubsubnet2: 10.0.1.0/24
+  AWSRegionToAMI:
+    - us-east-1:
+        AMIID: ami-40286957
+    - us-east-2:
+        AMIID: ami-c5062ba0
+  Parameters:
+    EcsInstanceType:
+      Type: String
+      Description: 'ECS EC2 Instance type'
+      Default: 't2.micro'
+      AllowedValues:
+        - t2.micro
+        - t2.nano
+        - t2-medium
+      ConstraintDescription: 'must be a valid EC2 instance type'
+    KeyName:
+      Type: "AWS::EC2::KeyPair::KeyName"
+      Description: 'Optional - Name of an existing EC2 KeyPair for SSH access'
+      Default: ''
+
+    VpcId:
+      Type: String
+      Description: 'Optional - Vpc ID of existing VPC'
+      Default: ''
+      AllowedPattern: "^(?:vpc-[0-9a-f]{8}|)$"
+      ConstraintDescription: 'VPC Id must begin with vpc- or leave blank for new VPC'
+
+    SubnetIds:
+      Type: CommaDelimitedList
+      Description: 'Optional - Comma seperated list of two subnets from existing vpc'
+      Default: ''
+
+    AsgMaxSize:
+      Type: Number
+      Description: "Max size for ECS ASG"
+      Default: '1'
+
+    SecurityGroup:
+      Type: String
+      Description: "Optional - Existing Security Group else leave blank"
+      Default: ''
+
+    SourceCidr:
+      Type: String
+      Description: "Optional - CIDR/IP for EcsPort - defaults to 0.0.0.0/0"
+      Default: '0.0.0.0/0'
+
+    EcsPort:
+      Type: String
+      Description: "Optional - SG port to open on ECS instances default - 80"
+      Default: '80'
+
+    VpcAvailabilityZones:
+      Type: "CommaDelimitedList"
+      Descriptions: "Optional - Comma-delimited list of VPC aZs"
+      Default: ''
+
+    EcsCluster:
+      Type: String
+      Description: "ECS Cluster name"
+      Default: "getting-started" #here i can use Env sub for Prod or dev
+
+    Conditions:
+      CreateVpcResources:
